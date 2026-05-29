@@ -36,13 +36,13 @@
 
     const mtlLoader = new THREE.MTLLoader();
     mtlLoader.setPath(BASE);
-    mtlLoader.load("house_test.mtl", function(materials) {
+    mtlLoader.load("house_color.mtl", function(materials) {
       materials.preload();
 
       const objLoader = new THREE.OBJLoader();
       objLoader.setMaterials(materials);
       objLoader.setPath(BASE);
-      objLoader.load("house_test.obj", function(object) {
+      objLoader.load("house_color.obj", function(object) {
         document.getElementById('loading').style.display = 'none';
 
         const box = new THREE.Box3().setFromObject(object);
