@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { margin:0; background:#f0f0f0; }
+    #loading { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:sans-serif; color:#555; }
+    canvas { display:block; }
+  </style>
+</head>
+<body>
+  <div id="loading">⏳ Modell wird geladen...</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const STL_URL = "https://raw.githubusercontent.com/arcmonki-ship-it/stl-files/main/r%C3%BCstung_test.stl";
+    const container = document.body;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f0f0);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(1, 2, 3);
+    scene.add(dir);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    const loader = new THREE.STLLoader();
+    loader.load(STL_URL,
+      function(geometry) {
+        document.getElementById('loading').style.display = 'none';
+        geometry.computeBoundingBox();
+        const center = new THREE.Vector3();
+        geometry.boundingBox.getCenter(center);
+        geometry.translate(-center.x, -center.y, -center.z);
+        const size = new THREE.Vector3();
+        geometry.boundingBox.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        camera.position.set(0, maxDim * 0.5, maxDim * 2);
+        controls.update();
+        scene.add(new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+          color: 0x8B4513, specular: 0x222222, shininess: 40
+        })));
+      },
+      function(xhr) {
+        if (xhr.total > 0) {
+          document.getElementById('loading').innerHTML = '⏳ ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
+        }
+      }
+    );
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
