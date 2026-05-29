@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body { margin:0; background:#f0f0f0; overflow:hidden; }
+    body { margin:0; background:#ffffff; overflow:hidden; }
     #loading { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:sans-serif; color:#555; }
     canvas { display:block; }
   </style>
@@ -18,7 +18,7 @@
     const BASE = "https://raw.githubusercontent.com/arcmonki-ship-it/stl-files/main/";
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f0f0);
+    scene.background = new THREE.Color(0xffffff);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
 
@@ -38,7 +38,6 @@
     mtlLoader.setPath(BASE);
     mtlLoader.load("house_color.mtl", function(materials) {
       materials.preload();
-
       const objLoader = new THREE.OBJLoader();
       objLoader.setMaterials(materials);
       objLoader.setPath(BASE);
@@ -57,7 +56,19 @@
         controls.update();
 
         scene.add(object);
+      },
+      function(xhr) {
+        if (xhr.total > 0) {
+          document.getElementById('loading').innerHTML = '⏳ ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
+        }
+      },
+      function(err) {
+        document.getElementById('loading').innerHTML = '❌ Fehler beim Laden: ' + err;
       });
+    },
+    function(xhr) {},
+    function(err) {
+      document.getElementById('loading').innerHTML = '❌ MTL Fehler: ' + err;
     });
 
     (function animate() {
