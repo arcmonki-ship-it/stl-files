@@ -45,7 +45,7 @@
         const size = new THREE.Vector3();
         geometry.boundingBox.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z);
-        camera.position.set(0, maxDim * 0.5, maxDim * 2);
+        camera.position.set(0, maxDim * 2, maxDim * 1);
         controls.update();
         scene.add(new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
           color: 0x8B4513, specular: 0x222222, shininess: 40
